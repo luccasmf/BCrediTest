@@ -1,4 +1,6 @@
 using NUnit.Framework;
+using BCrediTest.Models;
+using BCrediTest.BusinessLayer;
 
 namespace Tests
 {
