@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BCrediTest.BusinessLayer;
 using BCrediTest.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,11 @@ namespace BCrediTest.Controllers
 {
     public class ContractsController : Controller
     {
+        private readonly BLContract _blContract;
+        public ContractsController(BLContract blContract)
+        {
+            _blContract = blContract;
+        }
         public IActionResult Index()
         {
             List<Contract> contracts = new List<Contract>();
