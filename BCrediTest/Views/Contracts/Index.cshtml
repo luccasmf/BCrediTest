@@ -1,0 +1,74 @@
+﻿@model IEnumerable<BCrediTest.Models.Contract>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Contract List</h2>
+
+<p>
+    <a asp-action="UploadData">Data Import</a>
+</p>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ExternalId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerEmail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerCpf)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LoanValue)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentTerm)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RealtyAddress)
+            </th>
+            <th>
+                Actions
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ExternalId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CustomerName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CustomerEmail)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CustomerCpf)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LoanValue)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PaymentTerm)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RealtyAddress)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = item.ExternalId }) |
+                    @Html.ActionLink("Delete", "Delete", new {  id=item.ExternalId },new { onclick = "return confirm('Are sure wants to delete?');" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
