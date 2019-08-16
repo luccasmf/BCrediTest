@@ -51,7 +51,7 @@ namespace BCrediTest.Controllers
 
         public IActionResult Delete(string id)
         {
-
+            _blContract.DeleteContract(id);
             return RedirectToAction("Index");
         }
 

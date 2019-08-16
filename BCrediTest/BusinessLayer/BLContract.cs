@@ -75,6 +75,11 @@ namespace BCrediTest.BusinessLayer
             return success;
         }
 
+        internal void DeleteContract(string id)
+        {
+            bool success = _contractRepository.DeleteContract(id);
+        }
+
         public object ImportDelayedInstallments(IFormFile file)
         {
             return true;

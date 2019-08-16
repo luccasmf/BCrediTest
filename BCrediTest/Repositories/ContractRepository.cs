@@ -14,6 +14,7 @@ namespace BCrediTest.Repositories
         List<Contract> GetAllContracts();
         ContractDetailViewModel GetContractDetail(string contractId);
         bool PersistInstallments(List<DelayedInstallment> installments);
+        bool DeleteContract(string id);
     }
     public class ContractRepository : IContractRepository
     {
@@ -23,6 +24,13 @@ namespace BCrediTest.Repositories
             _context = context;
         }
 
+        public bool DeleteContract(string id)
+        {
+            _context.Contracts.Remove(_context.Contracts.FirstOrDefault(x => x.ExternalId == id));
+
+            return _context.SaveChanges() > 0;
+        }
+
         public List<Contract> GetAllContracts()
         {
             return _context.Contracts.ToList();
@@ -30,7 +38,7 @@ namespace BCrediTest.Repositories
 
         public ContractDetailViewModel GetContractDetail(string contractId)
         {
-            Contract c = _context.Contracts.Where(x => x.ExternalId == contractId).Include(x => x.Installments.Where(y => y.Delayed == true)).FirstOrDefault();
+            Contract c = _context.Contracts.Where(x => x.ExternalId == contractId).Include(x => x.Installments).FirstOrDefault();
 
             return new ContractDetailViewModel();
         }
