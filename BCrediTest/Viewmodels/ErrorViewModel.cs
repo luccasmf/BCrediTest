@@ -1,6 +1,6 @@
 using System;
 
-namespace BCrediTest.Models
+namespace BCrediTest.Viewmodels
 {
     public class ErrorViewModel
     {

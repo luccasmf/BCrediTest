@@ -1,5 +1,6 @@
 ﻿using BCrediTest.Data;
 using BCrediTest.Models;
+using BCrediTest.Viewmodels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace BCrediTest.Repositories
         ContractDetailViewModel GetContractDetail(string contractId);
         bool PersistInstallments(List<DelayedInstallment> installments);
         bool DeleteContract(string id);
+        List<DelayedInstallment> GetDelayedInstallments(List<int> installmentsIds);
+        bool PersistBankSlip(BankSlip bankSlip);
     }
     public class ContractRepository : IContractRepository
     {
@@ -55,10 +58,21 @@ namespace BCrediTest.Repositories
             return details;
         }
 
+        public List<DelayedInstallment> GetDelayedInstallments(List<int> installmentsIds)
+        {
+            return _context.DelayedInstallments.Where(x => installmentsIds.Contains(x.InstallmentId)).ToList();
+        }
+
+        public bool PersistBankSlip(BankSlip bankSlip)
+        {
+            _context.BankSlips.Add(bankSlip);
+            return _context.SaveChanges() > 0;
+        }
+
         public bool PersistContracts(List<Contract> contractList)
         {
             _context.Contracts.AddRange(contractList);
-
+            
             return _context.SaveChanges() == contractList.Count;
         }
 

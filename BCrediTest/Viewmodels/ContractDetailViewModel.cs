@@ -1,9 +1,10 @@
-﻿using System;
+﻿using BCrediTest.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BCrediTest.Models
+namespace BCrediTest.Viewmodels
 {
     public class ContractDetailViewModel
     {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using BCrediTest.Models;
+using BCrediTest.Viewmodels;
 
 namespace BCrediTest.Controllers
 {

@@ -1,0 +1,78 @@
+﻿@model BCrediTest.Viewmodels.BankSlipScheduleViewModel
+
+@{
+    ViewData["Title"] = "Schedule";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    TempData["currentId"] = ViewBag.CurrentId;
+
+}
+
+<h2>Bank slip schedule for #@ViewBag.CurrentId</h2>
+<a asp-action="Index">Contracts listing</a>
+
+<form method="post" asp-controller="Contracts" asp-action="CreateSlip">
+    <div>
+        <h4>Selected installments</h4>
+        <hr />
+
+        <table class="table table-striped col-lg-8">
+            <thead>
+                <tr>
+                    <th>
+                        Index
+                    </th>
+                    <th>
+                        Due date
+                    </th>
+                    <th>
+                        Days in Delay
+                    </th>
+                    <th>
+                        Value
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Installments.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => Model.Installments[i].InstallmentIndex)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => Model.Installments[i].DueDate, "{0:dd/MM/yyyy}")
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => Model.Installments[i].DaysInDelay)
+                        </td>
+                        <td>
+                            $ @Html.DisplayFor(modelItem => Model.Installments[i].Value)
+                        </td>
+
+                        @Html.HiddenFor(modelItem => Model.Installments[i].InstallmentId)
+                        @Html.HiddenFor(modelItem => Model.Installments[i].DueDate)
+                        @Html.HiddenFor(modelItem => Model.Installments[i].Value)
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div>
+            @Html.Label("FeeValue","Fee Value (%):")
+            @Html.TextBoxFor(model => model.FeeValue, new { @type = "number", @class = "span4", @min = "0", @Value="5" })
+        </div>
+        <div>
+            @Html.Label("Interest Value", "Interest Value (%):")
+
+            @Html.TextBoxFor(model => model.InterestValue, new { @type = "number", @class = "span4", @min = "0", @Value = "1"  })
+        </div>
+        <div>
+            @Html.Label("DueDate","Due Date:")
+            @Html.EditorFor(model => model.DueDate, "{0:dd/MM/yyyy}", new { @class = "datepicker" })
+        </div>
+
+    </div>
+    <button type="submit" class="btn btn-primary">Schedule</button>
+</form>

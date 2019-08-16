@@ -1,6 +1,7 @@
 ﻿using BCrediTest.Extensions;
 using BCrediTest.Models;
 using BCrediTest.Repositories;
+using BCrediTest.Viewmodels;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace BCrediTest.BusinessLayer
             _contractRepository = contractRepository;
         }
 
-        public object ImportFile(IFormFile file,int fileType)
+        public object ImportFile(IFormFile file, int fileType)
         {
             List<string> entries = file.ReadAsList();
             entries.RemoveAt(0);
@@ -43,7 +44,7 @@ namespace BCrediTest.BusinessLayer
                             RealtyAddress = values[6].Replace("\"", string.Empty)
                         });
                     }
-                
+
                     success = _contractRepository.PersistContracts(contracts);
                     break;
                 case 2:
@@ -62,11 +63,11 @@ namespace BCrediTest.BusinessLayer
                             Delayed = true
                         });
                     }
-            
+
                     success = _contractRepository.PersistInstallments(installments);
                     break;
             }
-            
+
 
 
 
@@ -75,7 +76,45 @@ namespace BCrediTest.BusinessLayer
             return success;
         }
 
-        internal void DeleteContract(string id)
+        public void CreateBankSlip(BankSlipScheduleViewModel bankslipSchedule, string contractId)
+        {
+            BankSlip bankSlip = new BankSlip();
+            decimal baseValue = bankslipSchedule.Installments.Sum(x => x.Value);
+
+            bankSlip.DueDate = bankslipSchedule.DueDate;
+            bankSlip.Value += baseValue * (1 + (bankslipSchedule.FeeValue / 100));
+            bankSlip.BankSlipInstallment = new List<BankSlipInstallment>();
+                
+            bankslipSchedule.Installments.ForEach(x =>
+            {
+
+                bankSlip.Value += x.Value * (decimal)Math.Pow((double)(bankslipSchedule.InterestValue / 100), x.DaysInDelay);
+                bankSlip.BankSlipInstallment.Add(new BankSlipInstallment { InstallmentId = x.InstallmentId });
+
+            });
+
+            bankSlip.Status = BankSlipStatus.Pending;
+
+            bool persisted = _contractRepository.PersistBankSlip(bankSlip);
+
+            if(persisted)
+            {
+                //send email
+            }
+        }
+
+        public BankSlipScheduleViewModel GetDetailsToSchedule(List<int> installmentsIds)
+        {
+
+            BankSlipScheduleViewModel scheduleViewModel = new BankSlipScheduleViewModel();
+
+            scheduleViewModel.Installments = _contractRepository.GetDelayedInstallments(installmentsIds);
+            scheduleViewModel.DueDate = DateTime.Now;
+
+            return scheduleViewModel;
+        }
+
+        public void DeleteContract(string id)
         {
             bool success = _contractRepository.DeleteContract(id);
         }

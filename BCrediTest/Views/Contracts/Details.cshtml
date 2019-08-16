@@ -1,4 +1,4 @@
-﻿@model BCrediTest.Models.ContractDetailViewModel
+﻿@model BCrediTest.Viewmodels.ContractDetailViewModel
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -52,7 +52,7 @@
 </div>
 
 
-<form method="post" asp-controller="Contracts" asp-action="BankSlipSchedule">
+<form method="post" asp-controller="Contracts" asp-action="Schedule">
     <div>
         <h3>Delayed Installments</h3>
     </div>
@@ -84,7 +84,7 @@
                         @Html.DisplayFor(modelItem => Model.DelayedInstallments[i].InstallmentIndex)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => Model.DelayedInstallments[i].DueDate)
+                        @Html.DisplayFor(modelItem => Model.DelayedInstallments[i].DueDate, "{0:dd/MM/yyyy}")
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => Model.DelayedInstallments[i].DaysInDelay)
@@ -97,6 +97,7 @@
                         @Html.CheckBoxFor(modelItem => Model.DelayedInstallments[i].IsSelected)
                     </td>
                     @Html.HiddenFor(modelItem => Model.DelayedInstallments[i].InstallmentId)
+                    @*@Html.HiddenFor(modelItem  => Model.DelayedInstallments[i])*@
                 </tr>
             }
 
@@ -135,7 +136,7 @@
                 </tr>
             </thead>
             <tbody>
-                @*@foreach (var item in Model.BankSlips)
+                @foreach (var item in Model.BankSlips)
                 {
                     <tr>
                         <td>
@@ -154,7 +155,7 @@
                             @Html.CheckBoxFor(modelItem => item.IsSelected)
                         </td>
                     </tr>
-                }*@
+                }
             </tbody>
         </table>
     </div>
