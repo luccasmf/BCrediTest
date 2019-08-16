@@ -15,7 +15,7 @@ namespace BCrediTest.Repositories
         ContractDetailViewModel GetContractDetail(string contractId);
         bool PersistInstallments(List<DelayedInstallment> installments);
     }
-    public class ContractRepository: IContractRepository
+    public class ContractRepository : IContractRepository
     {
         private readonly BCrediDbContext _context;
         public ContractRepository(BCrediDbContext context)
@@ -30,7 +30,7 @@ namespace BCrediTest.Repositories
 
         public ContractDetailViewModel GetContractDetail(string contractId)
         {
-            Contract c = _context.Contracts.Where(x => x.ExternalId == contractId).Include(x => x.Installments).FirstOrDefault();
+            Contract c = _context.Contracts.Where(x => x.ExternalId == contractId).Include(x => x.Installments.Where(y => y.Delayed == true)).FirstOrDefault();
 
             return new ContractDetailViewModel();
         }
