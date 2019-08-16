@@ -8,7 +8,7 @@ namespace BCrediTest.Models
 {
     public class BankSlip
     {
-        public int Id { get; set; }
+        public int BankslipId { get; set; }
         public DateTime DueDate { get; set; }
         public decimal Value { get; set; }
         public BankSlipStatus Status { get; set; }
@@ -23,7 +23,7 @@ namespace BCrediTest.Models
         }
         [NotMapped]
         public bool IsSelected { get; set; }
-        public virtual ICollection<DelayedInstallment> Installments { get; set; }
+        public virtual ICollection<BankSlipInstallment> BankSlipInstallment { get; set; }
 
     }
 

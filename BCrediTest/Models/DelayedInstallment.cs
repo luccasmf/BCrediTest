@@ -10,7 +10,7 @@ namespace BCrediTest.Models
     public class DelayedInstallment
     {
         [Key]
-        public int Id { get; set; }
+        public int InstallmentId { get; set; }
         public string ContractId { get; set; }
         public string InstallmentIndex { get; set; }
         public DateTime DueDate { get; set; }
@@ -28,8 +28,9 @@ namespace BCrediTest.Models
 
         [NotMapped]
         public bool IsSelected { get; set; }
+        [ForeignKey("ContractId")]
         public virtual Contract Contracts { get; set; }
-        public virtual ICollection<BankSlip> BankSlips { get; set; }
+        public virtual ICollection<BankSlipInstallment> BankSlipInstallment { get; set; }
 
     }
 }

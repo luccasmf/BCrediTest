@@ -55,9 +55,9 @@ namespace BCrediTest.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult BankSlipSchedule(List<DelayedInstallment> installments)
+        public IActionResult BankSlipSchedule(ContractDetailViewModel installments)
         {
-
+            List<DelayedInstallment> delayedInstallments = installments.DelayedInstallments.Where(x => x.IsSelected == true).ToList();
             string currentId = (TempData["currentId"]).ToString();
 
             return RedirectToAction("Details", new { id = currentId });

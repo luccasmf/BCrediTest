@@ -96,7 +96,7 @@
                     <td>
                         @Html.CheckBoxFor(modelItem => Model.DelayedInstallments[i].IsSelected)
                     </td>
-                    @Html.HiddenFor(modelItem => Model.DelayedInstallments[i].Id)
+                    @Html.HiddenFor(modelItem => Model.DelayedInstallments[i].InstallmentId)
                 </tr>
             }
 
@@ -135,7 +135,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.BankSlips)
+                @*@foreach (var item in Model.BankSlips)
                 {
                     <tr>
                         <td>
@@ -154,7 +154,7 @@
                             @Html.CheckBoxFor(modelItem => item.IsSelected)
                         </td>
                     </tr>
-                }
+                }*@
             </tbody>
         </table>
     </div>

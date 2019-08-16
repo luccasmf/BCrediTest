@@ -38,9 +38,21 @@ namespace BCrediTest.Repositories
 
         public ContractDetailViewModel GetContractDetail(string contractId)
         {
-            Contract c = _context.Contracts.Where(x => x.ExternalId == contractId).Include(x => x.Installments).FirstOrDefault();
+            ContractDetailViewModel details = new ContractDetailViewModel();
+            Contract c = _context.Contracts.Where(x => x.ExternalId == contractId)
+                .Include(x => x.Installments)
+                .FirstOrDefault();
 
-            return new ContractDetailViewModel();
+            details.Contract = c;
+            details.DelayedInstallments = c.Installments.Where(x=>x.Delayed==true).ToList();
+
+            int[] installmentsId = details.DelayedInstallments.Select(x => x.InstallmentId).ToArray();
+
+            details.BankSlips = (from bk in _context.BankSlips
+                                   where bk.BankSlipInstallment.Any(x => installmentsId.Contains(x.InstallmentId))
+                                   && bk.Status == BankSlipStatus.Pending
+                                   select bk).ToList();
+            return details;
         }
 
         public bool PersistContracts(List<Contract> contractList)

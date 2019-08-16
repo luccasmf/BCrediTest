@@ -28,16 +28,26 @@ namespace BCrediTest.Data
             });
             modelBuilder.Entity<DelayedInstallment>(entity =>
             {
-                entity.HasKey(p => p.Id);
-                entity.HasMany(p => p.BankSlips);
+                entity.HasKey(p => p.InstallmentId);
 
             });
             modelBuilder.Entity<BankSlip>(entity =>
             {
-                entity.HasKey(p => p.Id);
-                entity.HasMany(p => p.Installments);
+                entity.HasKey(p => p.BankslipId);
                 
             });
+
+            modelBuilder.Entity<BankSlipInstallment>()
+                .HasKey(bi => new { bi.BankslipId, bi.InstallmentId });
+            modelBuilder.Entity<BankSlipInstallment>()
+                .HasOne(bi => bi.BankSlip)
+                .WithMany(bi => bi.BankSlipInstallment)
+                .HasForeignKey(bi => bi.BankslipId);
+
+            modelBuilder.Entity<BankSlipInstallment>()
+               .HasOne(bi => bi.DelayedInstallment)
+               .WithMany(bi => bi.BankSlipInstallment)
+               .HasForeignKey(bi => bi.InstallmentId);
 
         }
     }
