@@ -1,0 +1,171 @@
+﻿@model BCrediTest.Models.ContractDetailViewModel
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    TempData["currentId"] = Model.Contract.ExternalId;
+}
+
+<h2>Contract Details #@Html.DisplayFor(model => model.Contract.ExternalId)</h2>
+<p>
+    <a asp-action="Index">Contract List</a>
+</p>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Contract.CustomerName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contract.CustomerName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Contract.CustomerEmail)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contract.CustomerEmail)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Contract.CustomerCpf)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contract.CustomerCpf)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Contract.LoanValue)
+        </dt>
+        <dd>
+            $ @Html.DisplayFor(model => model.Contract.LoanValue)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Contract.PaymentTerm)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contract.PaymentTerm) Months
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Contract.RealtyAddress)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Contract.RealtyAddress)
+        </dd>
+    </dl>
+</div>
+
+
+<form method="post" asp-controller="Contracts" asp-action="BankSlipSchedule">
+    <div>
+        <h3>Delayed Installments</h3>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Index
+                </th>
+                <th>
+                    Due date
+                </th>
+                <th>
+                    Days in Delay
+                </th>
+                <th>
+                    Value
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody name="installments">
+            @for (int i = 0; i < Model.DelayedInstallments.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model.DelayedInstallments[i].InstallmentIndex)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model.DelayedInstallments[i].DueDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model.DelayedInstallments[i].DaysInDelay)
+                    </td>
+                    <td>
+                        $ @Html.DisplayFor(modelItem => Model.DelayedInstallments[i].Value)
+                    </td>
+
+                    <td>
+                        @Html.CheckBoxFor(modelItem => Model.DelayedInstallments[i].IsSelected)
+                    </td>
+                    @Html.HiddenFor(modelItem => Model.DelayedInstallments[i].Id)
+                </tr>
+            }
+
+
+        </tbody>
+    </table>
+
+
+    <button type="submit" class="btn btn-primary"> Schedule new bank</button>
+
+</form>
+
+<form method="post" asp-controller="Contracts" asp-action="MarkAsPaid">
+    <div>
+        <h3>Bank Slips</h3>
+    </div>
+    <div>
+        <table class="table table-striped" name="index">
+            <thead>
+                <tr>
+                    <th>
+                        Due date
+                    </th>
+                    <th>
+                        Value
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        Delay
+                    </th>
+                    <th>
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.BankSlips)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DueDate)
+                        </td>
+                        <td>
+                            $ @Html.DisplayFor(modelItem => item.Value)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Delay)
+                        </td>
+                        <td>
+                            @Html.CheckBoxFor(modelItem => item.IsSelected)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-primary">
+            Mark as paid
+        </button>
+    </div>
+</form>
+
+<div>
+
+</div>

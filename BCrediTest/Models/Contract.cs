@@ -17,6 +17,6 @@ namespace BCrediTest.Models
         public int  PaymentTerm { get; set; }
         public string RealtyAddress { get; set; }
 
-        public ICollection<DelayedInstallment> Installments { get; set; }
+        public virtual ICollection<DelayedInstallment> Installments { get; set; }
     }
 }

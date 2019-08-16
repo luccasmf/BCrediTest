@@ -19,19 +19,7 @@ namespace BCrediTest.Controllers
         }
         public IActionResult Index()
         {
-            List<Contract> contracts = new List<Contract>();
-
-            contracts.Add(new Contract
-            {
-                CustomerCpf = "088.985.269-38",
-                CustomerEmail = "luccas_mf@live.com",
-                CustomerName = "Luccas",
-                ExternalId = "123",
-                LoanValue = (decimal)1000.50,
-                PaymentTerm = 120,
-                RealtyAddress = "Endereço"
-            });
-            return View(contracts);
+            return View(_blContract.ListContracts());
         }
 
         [HttpGet]
@@ -47,22 +35,32 @@ namespace BCrediTest.Controllers
         }
 
         [HttpPost]
-        public IActionResult UploadData(IFormFile file, string fileType)
+        public IActionResult UploadData(IFormFile file, int fileType)
         {
 
-            return View();
+            _blContract.ImportFile(file, fileType);
+
+
+            return RedirectToAction("UploadData");
         }
 
         public IActionResult Details(string id)
         {
-
-            return View();
+            return View(_blContract.GetContractDetail(id));
         }
 
         public IActionResult Delete(string id)
         {
 
             return RedirectToAction("Index");
+        }
+
+        public IActionResult BankSlipSchedule(List<DelayedInstallment> installments)
+        {
+
+            string currentId = (TempData["currentId"]).ToString();
+
+            return RedirectToAction("Details", new { id = currentId });
         }
     }
 }

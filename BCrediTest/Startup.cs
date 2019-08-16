@@ -51,11 +51,11 @@ namespace BCrediTest
                 sw.DescribeAllEnumsAsStrings();
                 sw.SwaggerDoc("v1", new Info { Title = "BCrediTest", Version = "v1" });
 
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.XML";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.XML";
+                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
                 //... and tell Swagger to use those XML comments.
-                sw.IncludeXmlComments(xmlPath);
+                //sw.IncludeXmlComments(xmlPath);
             });
 
                 services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -86,7 +86,7 @@ namespace BCrediTest
 
             app.UseMvc(routes =>
             {
-                routes.MapRoute(name: "api", template: "api/{controller}");
+                //routes.MapRoute(name: "api", template: "api/{controller}");
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Contracts}/{action=Index}/{id?}");
