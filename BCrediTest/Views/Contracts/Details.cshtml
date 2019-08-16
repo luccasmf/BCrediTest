@@ -3,6 +3,25 @@
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
     TempData["currentId"] = Model.Contract.ExternalId;
+
+    if (ViewBag.Success == false)
+    {
+        <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h4>Failed</h4>
+                        <p>
+                            Please select some installments to proceed.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 <h2>Contract Details #@Html.DisplayFor(model => model.Contract.ExternalId)</h2>
@@ -167,6 +186,4 @@
     </div>
 </form>
 
-<div>
 
-</div>

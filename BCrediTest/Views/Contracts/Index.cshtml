@@ -7,6 +7,7 @@
 
 <h2>Contract List</h2>
 
+
 <p>
     <a asp-action="UploadData">Data Import</a>
 </p>
@@ -56,7 +57,7 @@
                     @Html.DisplayFor(modelItem => item.CustomerCpf)
                 </td>
                 <td>
-                   $ @Html.DisplayFor(modelItem => item.LoanValue)
+                    $ @Html.DisplayFor(modelItem => item.LoanValue)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PaymentTerm)
@@ -66,9 +67,10 @@
                 </td>
                 <td>
                     @Html.ActionLink("Details", "Details", new { id = item.ExternalId }) |
-                    @Html.ActionLink("Delete", "Delete", new {  id=item.ExternalId },new { onclick = "return confirm('Are sure wants to delete?');" })
+                    @Html.ActionLink("Delete", "Delete", new { id = item.ExternalId }, new { onclick = "return confirm('Are sure wants to delete?');" })
                 </td>
             </tr>
         }
     </tbody>
 </table>
+

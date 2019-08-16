@@ -2,26 +2,62 @@
 @{
     ViewData["Title"] = "UploadData";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    
-}
 
-<h2>Upload Data</h2>
-<p>
-    <a asp-action="Index">Contract List</a>
-</p>
-<form method="post" enctype="multipart/form-data" asp-controller="Contracts" asp-action="UploadData">
-    <div class="dropdown">
-        <label for="fileType">File type</label>
-        <br/>
-        <select asp-items="@ViewBag.FileTypes" name="fileType" id="fileType" required="required" ></select>
-    </div>
-    <div class="form-group">
-        <label for="fileUpload">File</label>
 
-        <input type="file" name="file" title="File" id="fileUpload" accept=".csv"/>
-    </div>
-    <button type="submit" class="btn btn-primary">
-        Upload
-    </button>
-</form>
+    if (ViewBag.SuccessUpload == true)
+    {
+        <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h4>Upload completed successfuly !</h4>
+                        <p>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (ViewBag.SuccessUpload == false)
+    {
+        <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h4>Fail to upload !</h4>
+                        <p>
+                            Check if choosen file and "file type" matches!
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary waves-effect" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    }
+    <h2>Upload Data</h2>
+    <p>
+        <a asp-action="Index">Contract List</a>
+    </p>
+    <form method="post" enctype="multipart/form-data" asp-controller="Contracts" asp-action="UploadData">
+        <div class="dropdown">
+            <label for="fileType">File type</label>
+            <br />
+            <select asp-items="@ViewBag.FileTypes" name="fileType" id="fileType" required="required"></select>
+        </div>
+        <div class="form-group">
+            <label for="fileUpload">File</label>
+
+            <input type="file" name="file" title="File" id="fileUpload" accept=".csv" />
+        </div>
+        <button type="submit" class="btn btn-primary">
+            Upload
+        </button>
+    </form>
+
 

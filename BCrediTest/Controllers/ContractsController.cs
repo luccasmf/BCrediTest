@@ -24,13 +24,14 @@ namespace BCrediTest.Controllers
         }
 
         [HttpGet]
-        public IActionResult UploadData()
+        public IActionResult UploadData(bool? success)
         {
             object[] fileTypes = new object[] {
                new {Id= 1, Text= "Contracts" },
                new {Id= 2, Text= "Delayed Installments" }
             };
 
+            ViewBag.SuccessUpload = success;
             ViewBag.FileTypes = new SelectList(fileTypes, "Id", "Text");
             return View();
         }
@@ -39,14 +40,14 @@ namespace BCrediTest.Controllers
         public IActionResult UploadData(IFormFile file, int fileType)
         {
 
-            _blContract.ImportFile(file, fileType);
+                return RedirectToAction("UploadData",new { success = _blContract.ImportFile(file, fileType) });
 
 
-            return RedirectToAction("UploadData");
         }
 
-        public IActionResult Details(string id)
+        public IActionResult Details(string id, bool success = true)
         {
+            ViewBag.Success = success;
             return View(_blContract.GetContractDetail(id));
         }
 
@@ -57,24 +58,29 @@ namespace BCrediTest.Controllers
         }
 
 
-        public IActionResult Schedule(ContractDetailViewModel installments)
+        public IActionResult Schedule(ContractDetailViewModel installments, bool success = true)
         {
-            List<int> installmentsIds = installments.DelayedInstallments.Where(x => x.IsSelected == true).Select(x=>x.InstallmentId).ToList();
+            List<int> installmentsIds = installments.DelayedInstallments.Where(x => x.IsSelected == true).Select(x => x.InstallmentId).ToList();
             string currentId = (TempData["currentId"]).ToString();
             ViewBag.CurrentId = currentId;
 
+            if (!installmentsIds.Any())
+                return RedirectToAction("Details", new { id = currentId,success = false });
+
             BankSlipScheduleViewModel bankSlipSchedule = _blContract.GetDetailsToSchedule(installmentsIds);
-            
+            ViewBag.Success = success;
 
             return View(bankSlipSchedule);
         }
-
         public IActionResult CreateSlip(BankSlipScheduleViewModel bankslipSchedule)
         {
-            //List<int> installmentsIds = installments.DelayedInstallments.Where(x => x.IsSelected == true).Select(x => x.InstallmentId).ToList();
             string currentId = (TempData["currentId"]).ToString();
+            var data = _blContract.GetContractDetail(currentId);
+            if (bankslipSchedule.DueDate.Date < DateTime.Now.Date)
+                return RedirectToAction("Schedule", new { installments = data, success = false });
 
-            _blContract.CreateBankSlip(bankslipSchedule,currentId);
+
+            _blContract.CreateBankSlip(bankslipSchedule, currentId);
 
             return RedirectToAction("Details", new { id = currentId });
         }

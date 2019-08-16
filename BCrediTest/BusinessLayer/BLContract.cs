@@ -19,62 +19,67 @@ namespace BCrediTest.BusinessLayer
             _contractRepository = contractRepository;
         }
 
-        public object ImportFile(IFormFile file, int fileType)
+        public bool ImportFile(IFormFile file, int fileType)
         {
-            List<string> entries = file.ReadAsList();
-            entries.RemoveAt(0);
+            
             bool success = false;
-            switch (fileType)
+            try
             {
-                case 1:
-                    List<Contract> contracts = new List<Contract>();
+                List<string> entries = file.ReadAsList();
+                entries.RemoveAt(0);
+                switch (fileType)
+                {
+                    case 1:
+                        List<Contract> contracts = new List<Contract>();
 
-                    foreach (string csvLine in entries)
-                    {
-                        string[] values = csvLine.Split(',');
-
-                        contracts.Add(new Contract
+                        foreach (string csvLine in entries)
                         {
-                            ExternalId = values[0],
-                            CustomerName = values[1],
-                            CustomerEmail = values[2],
-                            CustomerCpf = values[3],
-                            LoanValue = decimal.Parse(values[4], NumberStyles.Any, CultureInfo.InvariantCulture),
-                            PaymentTerm = int.Parse(values[5]),
-                            RealtyAddress = values[6].Replace("\"", string.Empty)
-                        });
-                    }
+                            string[] values = csvLine.Split(',');
 
-                    success = _contractRepository.PersistContracts(contracts);
-                    break;
-                case 2:
-                    List<DelayedInstallment> installments = new List<DelayedInstallment>();
+                            contracts.Add(new Contract
+                            {
+                                ExternalId = values[0],
+                                CustomerName = values[1],
+                                CustomerEmail = values[2],
+                                CustomerCpf = values[3],
+                                LoanValue = decimal.Parse(values[4], NumberStyles.Any, CultureInfo.InvariantCulture),
+                                PaymentTerm = int.Parse(values[5]),
+                                RealtyAddress = values[6].Replace("\"", string.Empty)
+                            });
+                        }
 
-                    foreach (string csvLine in entries)
-                    {
-                        string[] values = csvLine.Split(',');
+                        success = _contractRepository.PersistContracts(contracts);
+                        break;
+                    case 2:
+                        List<DelayedInstallment> installments = new List<DelayedInstallment>();
 
-                        installments.Add(new DelayedInstallment
+                        foreach (string csvLine in entries)
                         {
-                            ContractId = values[0],
-                            InstallmentIndex = values[1],
-                            DueDate = DateTime.Parse(values[2]),
-                            Value = decimal.Parse(values[3], NumberStyles.Any, CultureInfo.InvariantCulture),
-                            Delayed = true
-                        });
-                    }
+                            string[] values = csvLine.Split(',');
 
-                    success = _contractRepository.PersistInstallments(installments);
-                    break;
+                            installments.Add(new DelayedInstallment
+                            {
+                                ContractId = values[0],
+                                InstallmentIndex = values[1],
+                                DueDate = DateTime.Parse(values[2]),
+                                Value = decimal.Parse(values[3], NumberStyles.Any, CultureInfo.InvariantCulture),
+                                Delayed = true
+                            });
+                        }
+
+                        success = _contractRepository.PersistInstallments(installments);
+                        break;
+                }
+            }
+            catch
+            {
+                success = false;
             }
 
 
 
-
-
-
             return success;
-        }
+            }
 
         public void CreateBankSlip(BankSlipScheduleViewModel bankslipSchedule, string contractId)
         {
