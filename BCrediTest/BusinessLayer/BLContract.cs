@@ -110,6 +110,8 @@ namespace BCrediTest.BusinessLayer
 
             scheduleViewModel.Installments = _contractRepository.GetDelayedInstallments(installmentsIds);
             scheduleViewModel.DueDate = DateTime.Now;
+            scheduleViewModel.FeeValue = 5;
+            scheduleViewModel.InterestValue = 1;
 
             return scheduleViewModel;
         }

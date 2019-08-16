@@ -61,16 +61,16 @@
 
         <div>
             @Html.Label("FeeValue","Fee Value (%):")
-            @Html.TextBoxFor(model => model.FeeValue, new { @type = "number", @class = "span4", @min = "0", @Value="5" })
+            @Html.TextBoxFor(model => model.FeeValue, new { @Value = 5, @type = "number", @class = "span4", @min = "0", @readonly=true })
         </div>
         <div>
             @Html.Label("Interest Value", "Interest Value (%):")
 
-            @Html.TextBoxFor(model => model.InterestValue, new { @type = "number", @class = "span4", @min = "0", @Value = "1"  })
+            @Html.TextBoxFor(model => model.InterestValue, new { @Value = "1", @type = "number", @class = "span4", @min = "0", @readonly =true})
         </div>
         <div>
             @Html.Label("DueDate","Due Date:")
-            @Html.EditorFor(model => model.DueDate, "{0:dd/MM/yyyy}", new { @class = "datepicker" })
+            @Html.EditorFor(model => model.DueDate, "{0:dd/MM/yyyy}", new { @Value = Model.DueDate.ToString("yyyy/MM/dd"), @class = "datepicker" })
         </div>
 
     </div>
