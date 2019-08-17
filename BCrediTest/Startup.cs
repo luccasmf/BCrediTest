@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BCrediTest.BusinessLayer;
 using BCrediTest.Data;
 using BCrediTest.Repositories;
+using BCrediTest.Services.Email;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -38,6 +39,8 @@ namespace BCrediTest
             services.AddTransient<IContractRepository, ContractRepository>();
             services.AddScoped<BLContract>();
 
+            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+            services.AddTransient<IEmailSender, EmailSender>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {

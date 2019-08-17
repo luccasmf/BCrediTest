@@ -57,7 +57,6 @@ namespace BCrediTest.Controllers
             return RedirectToAction("Index");
         }
 
-
         public IActionResult Schedule(ContractDetailViewModel installments, bool success = true)
         {
             List<int> installmentsIds = installments.DelayedInstallments.Where(x => x.IsSelected == true).Select(x => x.InstallmentId).ToList();
@@ -72,15 +71,25 @@ namespace BCrediTest.Controllers
 
             return View(bankSlipSchedule);
         }
+
         public IActionResult CreateSlip(BankSlipScheduleViewModel bankslipSchedule)
         {
             string currentId = (TempData["currentId"]).ToString();
             var data = _blContract.GetContractDetail(currentId);
             if (bankslipSchedule.DueDate.Date < DateTime.Now.Date)
-                return RedirectToAction("Schedule", new { installments = data, success = false });
+                return RedirectToAction("Details", new { id = currentId, success = false });
 
 
             _blContract.CreateBankSlip(bankslipSchedule, currentId);
+
+            return RedirectToAction("Details", new { id = currentId });
+        }
+
+        public IActionResult MarkAsPaid(ContractDetailViewModel detailViewModel)
+        {
+            string currentId = (TempData["currentId"]).ToString();
+
+            bool success = _blContract.MarkAsPaid(detailViewModel.BankSlips.Where(x=>x.IsSelected == true).Select(x=>x.BankslipId).ToArray());
 
             return RedirectToAction("Details", new { id = currentId });
         }

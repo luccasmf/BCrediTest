@@ -1,6 +1,7 @@
 ﻿using BCrediTest.Extensions;
 using BCrediTest.Models;
 using BCrediTest.Repositories;
+using BCrediTest.Services.Email;
 using BCrediTest.Viewmodels;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -11,14 +12,25 @@ using System.Threading.Tasks;
 
 namespace BCrediTest.BusinessLayer
 {
+    /// <summary>
+    /// Class containing all the contract related businnes rules for the application
+    /// </summary>
     public class BLContract
     {
         private readonly IContractRepository _contractRepository;
-        public BLContract(IContractRepository contractRepository)
+        private readonly IEmailSender _emailSender;
+        public BLContract(IContractRepository contractRepository, IEmailSender emailSender)
         {
             _contractRepository = contractRepository;
+            _emailSender = emailSender;
         }
 
+        /// <summary>
+        /// Formats the uploaded file to be stored on database according to the informed fileType
+        /// </summary>
+        /// <param name="file">The uploaded file</param>
+        /// <param name="fileType">Type of the uploaded file: 1 for Contracts, 2 for Delayed Installments</param>
+        /// <returns></returns>
         public bool ImportFile(IFormFile file, int fileType)
         {
             
@@ -38,13 +50,13 @@ namespace BCrediTest.BusinessLayer
 
                             contracts.Add(new Contract
                             {
-                                ExternalId = values[0],
-                                CustomerName = values[1],
-                                CustomerEmail = values[2],
-                                CustomerCpf = values[3],
-                                LoanValue = decimal.Parse(values[4], NumberStyles.Any, CultureInfo.InvariantCulture),
-                                PaymentTerm = int.Parse(values[5]),
-                                RealtyAddress = values[6].Replace("\"", string.Empty)
+                                ExternalId = values[0].Trim(),
+                                CustomerName = values[1].Trim(),
+                                CustomerEmail = values[2].Trim(),
+                                CustomerCpf = values[3].Trim(),
+                                LoanValue = decimal.Parse(values[4].Trim(), NumberStyles.Any, CultureInfo.InvariantCulture),
+                                PaymentTerm = int.Parse(values[5].Trim()),
+                                RealtyAddress = values[6].Replace("\"", string.Empty).Trim()
                             });
                         }
 
@@ -59,10 +71,10 @@ namespace BCrediTest.BusinessLayer
 
                             installments.Add(new DelayedInstallment
                             {
-                                ContractId = values[0],
-                                InstallmentIndex = values[1],
-                                DueDate = DateTime.Parse(values[2]),
-                                Value = decimal.Parse(values[3], NumberStyles.Any, CultureInfo.InvariantCulture),
+                                ContractId = values[0].Trim(),
+                                InstallmentIndex = values[1].Trim(),
+                                DueDate = DateTime.Parse(values[2].Trim()),
+                                Value = decimal.Parse(values[3].Trim(), NumberStyles.Any, CultureInfo.InvariantCulture),
                                 Delayed = true
                             });
                         }
@@ -81,6 +93,21 @@ namespace BCrediTest.BusinessLayer
             return success;
             }
 
+        /// <summary>
+        /// Marks the informed bank slips and the related delayed installments as paid 
+        /// </summary>
+        /// <param name="slipIds"></param>
+        /// <returns></returns>
+        public bool MarkAsPaid(int[] slipIds)
+        {
+            return _contractRepository.MarkSlipsAsPaid(slipIds);
+        }
+
+        /// <summary>
+        /// Creates a  bank slip for the given delayed  installments and contract and send it by email
+        /// </summary>
+        /// <param name="bankslipSchedule">Viewmodel containing all the data for generating the bank slip</param>
+        /// <param name="contractId">Id of the related contract</param>
         public void CreateBankSlip(BankSlipScheduleViewModel bankslipSchedule, string contractId)
         {
             BankSlip bankSlip = new BankSlip();
@@ -100,14 +127,29 @@ namespace BCrediTest.BusinessLayer
 
             bankSlip.Status = BankSlipStatus.Pending;
 
-            bool persisted = _contractRepository.PersistBankSlip(bankSlip);
+            bankSlip = _contractRepository.PersistBankSlip(bankSlip);
 
-            if(persisted)
+            if(bankSlip != null)
             {
-                //send email
+                SendEmailWithBankslip(bankSlip, contractId);
             }
         }
 
+        private async void SendEmailWithBankslip(BankSlip bankSlip, string contractId)
+        {
+            string message = string.Format("Id: {0}\nDue Date: {1}\nValue: {2}\nStatus: {3}", bankSlip.BankslipId, bankSlip.DueDate, string.Format("{0:C}", bankSlip.Value), bankSlip.Status);
+            string subject = string.Format("Bank slip for contract #{0}", contractId);
+            Contract contract = _contractRepository.GetContract(contractId);
+
+
+            await _emailSender.SendEmailAsync(contract.CustomerEmail, subject, message);
+        }
+
+        /// <summary>
+        /// Loads a viewmodel with the selected installments details
+        /// </summary>
+        /// <param name="installmentsIds">A list with all the desired installments id</param>
+        /// <returns></returns>
         public BankSlipScheduleViewModel GetDetailsToSchedule(List<int> installmentsIds)
         {
 
@@ -121,81 +163,35 @@ namespace BCrediTest.BusinessLayer
             return scheduleViewModel;
         }
 
+
+        /// <summary>
+        /// Deletes a contract from the database
+        /// </summary>
+        /// <param name="id">Id of the contract to be deleted</param>
         public void DeleteContract(string id)
         {
             bool success = _contractRepository.DeleteContract(id);
         }
-
-        public object ImportDelayedInstallments(IFormFile file)
-        {
-            return true;
-        }
-
+        
+        /// <summary>
+        /// Returns a list with every contract in the database
+        /// </summary>
+        /// <returns></returns>
         public List<Contract> ListContracts()
         {
 
             return _contractRepository.GetAllContracts();
         }
 
+        /// <summary>
+        /// Get all the details (delayed installments, bank slips, contract information) for a given contract
+        /// </summary>
+        /// <param name="contractId">The id of the desired contract</param>
+        /// <returns></returns>
         public ContractDetailViewModel GetContractDetail(string contractId)
         {
             ContractDetailViewModel dt = _contractRepository.GetContractDetail(contractId);
-            //List<DelayedInstallment> installments = new List<DelayedInstallment>();
-
-            //installments.Add(new DelayedInstallment
-            //{
-            //    ContractId = "123",
-            //    DueDate = DateTime.Parse("01/07/2019"),
-            //    InstallmentId = 1,
-            //    InstallmentIndex = "084/120",
-            //    Value = (decimal)1450.00,
-            //    Delayed = true
-            //});
-            //installments.Add(new DelayedInstallment
-            //{
-            //    ContractId = "123",
-            //    DueDate = DateTime.Parse("01/08/2019"),
-            //    InstallmentId = 1,
-            //    InstallmentIndex = "085/120",
-            //    Value = (decimal)1200.00,
-            //    Delayed = true
-            //});
-
-            //Contract c = new Contract
-            //{
-            //    CustomerCpf = "088.985.269-38",
-            //    CustomerEmail = "luccas_mf@live.com",
-            //    CustomerName = "Luccas",
-            //    ExternalId = "123",
-            //    LoanValue = (decimal)1000.50,
-            //    PaymentTerm = 120,
-            //    RealtyAddress = "Endereço",
-            //};
-
-            //List<BankSlip> bankSlips = new List<BankSlip>();
-            //bankSlips.Add(new BankSlip
-            //{
-            //    DueDate = DateTime.Parse("11/08/2019"),
-            //    BankslipId = 1,
-            //    IsSelected = false,
-            //    Status = BankSlipStatus.Pending,
-            //    Value = (decimal)1234.00
-            //});
-            //bankSlips.Add(new BankSlip
-            //{
-            //    DueDate = DateTime.Parse("13/08/2019"),
-            //    BankslipId = 2,
-            //    IsSelected = false,
-            //    Status = BankSlipStatus.Pending,
-            //    Value = (decimal)1245.00
-            //});
-
-            //ContractDetailViewModel details = new ContractDetailViewModel();
-
-            //details.Contract = c;
-            //details.DelayedInstallments = installments;
-            //details.BankSlips = bankSlips;
-
+            
             return dt;
         }
     }

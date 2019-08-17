@@ -17,7 +17,9 @@ namespace BCrediTest.Repositories
         bool PersistInstallments(List<DelayedInstallment> installments);
         bool DeleteContract(string id);
         List<DelayedInstallment> GetDelayedInstallments(List<int> installmentsIds);
-        bool PersistBankSlip(BankSlip bankSlip);
+        BankSlip PersistBankSlip(BankSlip bankSlip);
+        Contract GetContract(string contractId);
+        bool MarkSlipsAsPaid(int[] slipIds);
     }
     public class ContractRepository : IContractRepository
     {
@@ -37,6 +39,11 @@ namespace BCrediTest.Repositories
         public List<Contract> GetAllContracts()
         {
             return _context.Contracts.ToList();
+        }
+
+        public Contract GetContract(string contractId)
+        {
+            return _context.Contracts.FirstOrDefault(x => x.ExternalId == contractId);
         }
 
         public ContractDetailViewModel GetContractDetail(string contractId)
@@ -63,10 +70,27 @@ namespace BCrediTest.Repositories
             return _context.DelayedInstallments.Where(x => installmentsIds.Contains(x.InstallmentId)).ToList();
         }
 
-        public bool PersistBankSlip(BankSlip bankSlip)
+        public bool MarkSlipsAsPaid(int[] slipIds)
+        {
+            List<BankSlip> bankSlips = _context.BankSlips.Where(x => slipIds.Contains(x.BankslipId)).Include(x => x.BankSlipInstallment).ThenInclude(x => x.DelayedInstallment).ToList();
+            List<DelayedInstallment> installments = new List<DelayedInstallment>();
+
+           bankSlips.ForEach(x =>
+            {
+                x.Status = BankSlipStatus.Paid;
+                installments.AddRange(x.BankSlipInstallment.Select(y => y.DelayedInstallment));
+            });
+
+            installments.ForEach(x => x.Delayed = false);
+
+            return _context.SaveChanges() > 0;
+        }
+
+        public BankSlip PersistBankSlip(BankSlip bankSlip)
         {
             _context.BankSlips.Add(bankSlip);
-            return _context.SaveChanges() > 0;
+            _context.SaveChanges();
+            return bankSlip;
         }
 
         public bool PersistContracts(List<Contract> contractList)

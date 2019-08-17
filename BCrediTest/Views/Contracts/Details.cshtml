@@ -155,25 +155,26 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.BankSlips)
+                @for (int i = 0; i < Model.BankSlips.Count; i++)
                 {
                     <tr>
                         <td>
-                            @Html.DisplayFor(modelItem => item.DueDate)
+                            @Html.DisplayFor(modelItem => Model.BankSlips[i].DueDate)
                         </td>
                         <td>
-                            $ @Html.DisplayFor(modelItem => item.Value)
+                            $ @Html.DisplayFor(modelItem => Model.BankSlips[i].Value)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Status)
+                            @Html.DisplayFor(modelItem => Model.BankSlips[i].Status)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Delay)
+                            @Html.DisplayFor(modelItem => Model.BankSlips[i].Delay)
                         </td>
                         <td>
-                            @Html.CheckBoxFor(modelItem => item.IsSelected)
+                            @Html.CheckBoxFor(modelItem => Model.BankSlips[i].IsSelected)
                         </td>
                     </tr>
+                    @Html.HiddenFor(modelItem => Model.BankSlips[i].BankslipId)
                 }
             </tbody>
         </table>
