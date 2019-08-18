@@ -6,6 +6,7 @@ using BCrediTest.Viewmodels;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -108,7 +109,7 @@ namespace BCrediTest.BusinessLayer
         /// </summary>
         /// <param name="bankslipSchedule">Viewmodel containing all the data for generating the bank slip</param>
         /// <param name="contractId">Id of the related contract</param>
-        public void CreateBankSlip(BankSlipScheduleViewModel bankslipSchedule, string contractId)
+        public BankSlip CreateBankSlip(BankSlipScheduleViewModel bankslipSchedule, string contractId)
         {
             BankSlip bankSlip = new BankSlip();
             decimal baseValue = bankslipSchedule.Installments.Sum(x => x.Value);
@@ -129,10 +130,21 @@ namespace BCrediTest.BusinessLayer
 
             bankSlip = _contractRepository.PersistBankSlip(bankSlip);
 
-            if(bankSlip != null)
+            if(bankSlip.BankslipId != 0)
             {
-                SendEmailWithBankslip(bankSlip, contractId);
+                try
+                {
+                    SendEmailWithBankslip(bankSlip, contractId);
+
+                }
+                catch(Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
+
+                return bankSlip;
             }
+            return null;
         }
 
         private async void SendEmailWithBankslip(BankSlip bankSlip, string contractId)

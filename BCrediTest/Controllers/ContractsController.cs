@@ -88,8 +88,13 @@ namespace BCrediTest.Controllers
         public IActionResult MarkAsPaid(ContractDetailViewModel detailViewModel)
         {
             string currentId = (TempData["currentId"]).ToString();
+            int[] data = detailViewModel.BankSlips.Where(x => x.IsSelected == true).Select(x => x.BankslipId).ToArray();
 
-            bool success = _blContract.MarkAsPaid(detailViewModel.BankSlips.Where(x=>x.IsSelected == true).Select(x=>x.BankslipId).ToArray());
+                if(!data.Any())
+            {
+                return RedirectToAction("Details", new { id = currentId, success = false});
+            }
+            bool success = _blContract.MarkAsPaid(data);
 
             return RedirectToAction("Details", new { id = currentId });
         }

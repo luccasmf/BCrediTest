@@ -40,7 +40,7 @@ namespace BCrediTest.Services.Email
                 
                 MailMessage mail = new MailMessage()
                 {
-                    From = new MailAddress(_emailSettings.FromEmail)
+                    From = new MailAddress(_emailSettings.UsernameEmail)
                 };
 
                 mail.To.Add(new MailAddress(emailAddress));

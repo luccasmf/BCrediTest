@@ -12,7 +12,7 @@
                     <div class="modal-body">
                         <h4>Failed</h4>
                         <p>
-                            Please select some installments to proceed.
+                            Please select some installments or bank slips to proceed.
                         </p>
                     </div>
                     <div class="modal-footer">
@@ -138,6 +138,9 @@
             <thead>
                 <tr>
                     <th>
+                        Bank slip ID
+                    </th>
+                    <th>
                         Due date
                     </th>
                     <th>
@@ -158,6 +161,10 @@
                 @for (int i = 0; i < Model.BankSlips.Count; i++)
                 {
                     <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => Model.BankSlips[i].BankslipId)
+
+                        </td>
                         <td>
                             @Html.DisplayFor(modelItem => Model.BankSlips[i].DueDate)
                         </td>
