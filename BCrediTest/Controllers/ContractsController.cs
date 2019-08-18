@@ -80,7 +80,11 @@ namespace BCrediTest.Controllers
                 return RedirectToAction("Details", new { id = currentId, success = false });
 
 
-            _blContract.CreateBankSlip(bankslipSchedule, currentId);
+            BankSlip bl = _blContract.CreateBankSlip(bankslipSchedule, currentId);
+            if(bl == null)
+            {
+                return RedirectToAction("Details", new { id = currentId, success = false });
+            }
 
             return RedirectToAction("Details", new { id = currentId });
         }
