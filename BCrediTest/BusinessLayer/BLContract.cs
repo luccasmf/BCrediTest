@@ -112,6 +112,10 @@ namespace BCrediTest.BusinessLayer
         /// <param name="contractId">Id of the related contract</param>
         public BankSlip CreateBankSlip(BankSlipScheduleViewModel bankslipSchedule, string contractId)
         {
+            if(bankslipSchedule.DueDate < DateTime.Now)
+            {
+                return null;
+            }
             BankSlip bankSlip = new BankSlip();
             decimal baseValue = bankslipSchedule.Installments.Sum(x => x.Value);
 

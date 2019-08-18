@@ -7,20 +7,23 @@ using BCrediTest.Repositories;
 using System.Collections.Generic;
 using BCrediTest.Services.Email;
 using System.Linq;
+using System;
 
 namespace Tests
 {
     public class Tests
     {
-        DbContextOptions<BCrediDbContext> options;
+
         BLContract _bLContract;
         IEmailSender _emailSender;
+        BCrediDbContext _context;
         [SetUp]
         public void Setup()
         {
-            options = new DbContextOptionsBuilder<BCrediDbContext>()
+            DbContextOptions<BCrediDbContext> options = new DbContextOptionsBuilder<BCrediDbContext>()
                   .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
                   .Options;
+            _context = new BCrediDbContext(options);
 
             IContractRepository contractRepository = new ContractRepository(new BCrediDbContext(options));
             _bLContract = new BLContract(contractRepository, _emailSender);
@@ -35,7 +38,7 @@ namespace Tests
             contracts.Add(new Contract
             {
                 CustomerCpf = "088.985.269-38",
-                CustomerEmail = "luccas_mf@live.com",
+                CustomerEmail = "email@email.com",
                 CustomerName = "Luccas",
                 ExternalId = "123",
                 LoanValue = (decimal)1000.50,
@@ -46,7 +49,7 @@ namespace Tests
             contracts.Add(new Contract
             {
                 CustomerCpf = "088.985.269-38",
-                CustomerEmail = "luccas_mf@live.com",
+                CustomerEmail = "email@email.com",
                 CustomerName = "Luccas2",
                 ExternalId = "234",
                 LoanValue = (decimal)2000.50,
@@ -54,12 +57,11 @@ namespace Tests
                 RealtyAddress = "Endereço",
             });
 
-            using (var context = new BCrediDbContext(options))
-            {
-                var repository = new ContractRepository(context);
-                contractsPersisted = repository.PersistContracts(contracts);
 
-            }
+            var repository = new ContractRepository(_context);
+            contractsPersisted = repository.PersistContracts(contracts);
+
+
 
             List<DelayedInstallment> installments = new List<DelayedInstallment>();
             bool installmentsPersisted = false;
@@ -88,11 +90,10 @@ namespace Tests
 
 
             if (contractsPersisted)
-                using (var context = new BCrediDbContext(options))
-                {
-                    var repository = new ContractRepository(context);
-                    installmentsPersisted = repository.PersistInstallments(installments);
-                }
+            {
+                var repo = new ContractRepository(_context);
+                installmentsPersisted = repo.PersistInstallments(installments);
+            }
 
             if (installmentsPersisted)
                 Assert.Pass();
@@ -112,14 +113,17 @@ namespace Tests
 
             BCrediTest.Viewmodels.BankSlipScheduleViewModel detailsToSchedule = _bLContract.GetDetailsToSchedule(installments);
 
-            BankSlip bankSlip = _bLContract.CreateBankSlip(detailsToSchedule, contractDetail.Contract.ExternalId);
+            detailsToSchedule.FeeValue = 5;
+            detailsToSchedule.InterestValue = 1;
 
-            if(bankSlip != null)
+            detailsToSchedule.DueDate = DateTime.Now.AddDays(2);
+
+            BankSlip bankSlip = _bLContract.CreateBankSlip(detailsToSchedule, "123");
+
+
+            if (bankSlip != null)
             {
-                if (bankSlip.Value > contractDetail.DelayedInstallments.Sum(x => x.Value))
-                    Assert.Pass();
-                else
-                    Assert.Fail();
+                Assert.Pass();
             }
             else
             {
