@@ -84,9 +84,10 @@ namespace BCrediTest.BusinessLayer
                         break;
                 }
             }
-            catch
+            catch (Exception e)
             {
                 success = false;
+                Debug.WriteLine(e.Message);
             }
 
 
